@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f6fa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>95 → Future</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f6fa;color:#111;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Arial,sans-serif}
+main{max-width:520px;margin:auto;padding:calc(env(safe-area-inset-top) + 20px) 16px 100px}
+h1{font-size:30px;margin:0 0 4px}.sub{color:#777;margin-bottom:20px}
+.card,.item{background:#fff;border-radius:20px;box-shadow:0 5px 20px #00000008}
+.card{padding:18px;margin-bottom:16px}.progress{display:flex;align-items:center;gap:18px}
+.ring{width:100px;height:100px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#1677ff var(--p),#e9ebf0 0)}
+.ring:after{content:"";position:absolute;width:78px;height:78px;background:#fff;border-radius:50%}.ring span{z-index:1;font-weight:800;font-size:21px}
+.ring{position:relative}.grow{flex:1}.title{font-weight:700}.muted{font-size:13px;color:#777;margin-top:3px}
+h2{font-size:19px;margin:20px 0 10px}.item{width:100%;border:0;text-align:left;padding:15px;display:flex;align-items:center;gap:12px;margin:9px 0;font:inherit}
+.icon{width:42px;height:42px;border-radius:13px;background:#edf4ff;display:grid;place-items:center;font-size:20px}.check{width:30px;height:30px;border:2px solid #ccd0d8;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800}.done .check{background:#25b56b;border-color:#25b56b}.done .title{text-decoration:line-through;color:#777}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid .item{min-height:90px;align-items:flex-start;flex-wrap:wrap}.grid .grow{min-width:70px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fffffff2;backdrop-filter:blur(18px);border-top:1px solid #ddd;display:flex;justify-content:center;gap:45px;padding:10px 10px calc(env(safe-area-inset-bottom) + 8px)}
+nav button{border:0;background:none;color:#777;font:12px -apple-system,BlinkMacSystemFont,Arial}.active{color:#1677ff;font-weight:700}
+.page{display:none}.page.active{display:block}.goal{display:flex;gap:13px;padding:15px 0;border-bottom:1px solid #eee}.goal:last-child{border:0}.stat{display:flex;justify-content:space-between;background:#fff;padding:16px;border-radius:16px;margin:9px 0}.note{padding:15px;border-radius:16px;background:#eaf3ff;color:#28517e;line-height:1.45;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<section id="today" class="page active">
+<h1>95 → Future</h1><div class="sub">Build the life, one day at a time.</div>
+<div class="card progress"><div class="ring" id="ring"><span id="pct">0%</span></div><div><div class="title">Today's progress</div><div class="muted" id="count">0 of 10 completed</div><div class="muted">Focus on consistency, not perfection.</div></div></div>
+<h2>Daily checklist</h2><div id="list"></div>
+</section>
+
+<section id="goals" class="page">
+<h1>Goals</h1><div class="sub">Your bigger picture.</div>
+<div class="card" id="goalsList"></div>
+</section>
+
+<section id="progress" class="page">
+<h1>Progress</h1><div class="sub">Your current dashboard.</div>
+<div class="stat"><span>Today</span><b id="todayStat">0/10</b></div>
+<div class="stat"><span>Academic target</span><b>95%+</b></div>
+<div class="stat"><span>Gym</span><b id="gymStat">Not done</b></div>
+<div class="stat"><span>Sports</span><b id="sportsStat">Not done</b></div>
+<div class="stat"><span>Skills</span><b id="skillsStat">Not done</b></div>
+<div class="note">Next version: weekly history, study-hour timer, deadlines, water/protein tracking, body measurements, streaks and reminders.</div>
+</section>
+</main>
+<nav>
+<button class="active" onclick="show('today',this)">⌂<br>Today</button>
+<button onclick="show('goals',this)">◎<br>Goals</button>
+<button onclick="show('progress',this)">▥<br>Progress</button>
+</nav>
+<script>
+const key="95future-ios-v1";
+const tasks=[
+["college","🎓","College","Attend lectures / labs"],
+["study","📚","Study","Work toward 95%+"],
+["gym","🏋️","Gym","Train consistently"],
+["physique","💪","Physique","Nutrition + body progress"],
+["skills","⚙️","Skills","Technical / career skills"],
+["english","🗣️","English","Speak and practice"],
+["sports","🏸","Sports","Practice for competition"],
+["project","💻","Projects","Build / research"],
+["house","🧹","Home","Cleaning and responsibilities"],
+["health","💧","Health","Water + proper meals + sleep"]
+];
+const goals=[
+["🎓","95%+ Academics","Final-year priority"],
+["💪","Aesthetic Physique","Muscle + low body fat"],
+["🗣️","English & Communication","Speak confidently"],
+["⚙️","Skills","Become highly capable"],
+["🏸","Sports","Compete seriously"],
+["💻","Projects","Create useful things"],
+["₹","Business","Build something that earns"]
+];
+let state=JSON.parse(localStorage.getItem(key)||"{}");
+function save(){localStorage.setItem(key,JSON.stringify(state));render()}
+function toggle(k){state[k]=!state[k];save()}
+function row(t){let d=!!state[t[0]];return `<button class="item ${d?'done':''}" onclick="toggle('${t[0]}')"><div class="icon">${t[1]}</div><div class="grow"><div class="title">${t[2]}</div><div class="muted">${t[3]}</div></div><div class="check">${d?"✓":""}</div></button>`}
+function render(){
+let done=tasks.filter(t=>state[t[0]]).length,p=Math.round(done/tasks.length*100);
+document.getElementById("list").innerHTML=tasks.map(row).join("");
+document.getElementById("pct").textContent=p+"%";document.getElementById("count").textContent=done+" of "+tasks.length+" completed";
+document.getElementById("ring").style.setProperty("--p",p+"%");
+document.getElementById("todayStat").textContent=done+"/"+tasks.length;
+document.getElementById("gymStat").textContent=state.gym?"Done":"Not done";
+document.getElementById("sportsStat").textContent=state.sports?"Done":"Not done";
+document.getElementById("skillsStat").textContent=state.skills?"Done":"Not done";
+document.getElementById("goalsList").innerHTML=goals.map(g=>`<div class="goal"><div style="font-size:23px">${g[0]}</div><div class="grow"><div class="title">${g[1]}</div><div class="muted">${g[2]}</div></div></div>`).join("");
+}
+function show(id,b){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active")}
+render();
+</script>
+</body>
+</html>
